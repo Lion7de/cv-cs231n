@@ -75,12 +75,15 @@ def affine_backward(dout, cache):
     D = np.prod(np.shape(x)[1:])
     flattenedInput = np.reshape(x, (N, D))
 
+    # Calculate gradient in terms of x by using chain rule with dot product
     dx_temp = np.dot(dout, w.T)
     dx = np.reshape(dx_temp, x.shape)
-    db = dout
+
+    db = np.dot(dout.T, np.ones(dout.shape[0]))
+    print(dout.shape)
+    # Calculate gradient in terms of x by using chain rule with dot product
     dw = np.dot(flattenedInput.T, dout)
     
-
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -105,7 +108,8 @@ def relu_forward(x):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    # Simply find the element-wise maximum which is 0 or x_i
+    out = np.maximum(0, x)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -131,8 +135,9 @@ def relu_backward(dout, cache):
     # TODO: Implement the ReLU backward pass.                                 #
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-    pass
+    
+    dout[x < 0] = 0
+    dx = dout
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
