@@ -429,7 +429,7 @@ def dropout_forward(x, dropout_param):
     if "seed" in dropout_param:
         np.random.seed(dropout_param["seed"])
 
-    mask = None
+    mask = None 
     out = None
 
     if mode == "train":
@@ -439,7 +439,16 @@ def dropout_forward(x, dropout_param):
         #######################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        x_shape = x.shape
+        
+        # Create uniform distribution over [0, 1], calculate the probablity for a neuron to drop out -> 1-p
+        # Set every value lower than 1-p to 0
+        # Since the distribution is uniform it exactly sets the probablity for a node to drop out
+        # to 1-p
+        # Normalize the values to prevent necessary scaling calculations on predictions
+        mask = (np.random.rand(*x_shape) > (1 - p)) / p
+
+        out = x * mask
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         #######################################################################
@@ -451,7 +460,7 @@ def dropout_forward(x, dropout_param):
         #######################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        out = x
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         #######################################################################
@@ -482,7 +491,10 @@ def dropout_backward(dout, cache):
         #######################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        # Since the dropout layer does nothing else than deactivate neurons, 
+        # the backward pass only passes the gradients of still active neurons
+        # using the cached mask from the forward pass
+        dx = dout * mask
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         #######################################################################

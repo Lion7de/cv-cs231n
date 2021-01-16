@@ -55,7 +55,10 @@ class TwoLayerNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        self.params["W1"] = np.random.normal(scale=weight_scale, size=(input_dim, hidden_dim))
+        self.params["b1"] = np.zeros(hidden_dim)
+        self.params["W2"] = np.random.normal(scale=weight_scale, size=(hidden_dim, num_classes))
+        self.params["b2"] = np.zeros(hidden_dim)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -76,7 +79,7 @@ class TwoLayerNet(object):
           scores[i, c] is the classification score for X[i] and class c.
 
         If y is not None, then run a training-time forward and backward pass and
-        return a tuple of:
+        return a tuple of:sec
         - loss: Scalar value giving the loss
         - grads: Dictionary with the same keys as self.params, mapping parameter
           names to gradients of the loss with respect to those parameters.
@@ -88,7 +91,8 @@ class TwoLayerNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        w1_pass, w1_pass_cache = affine_relu_forward(X, self.params["W1"], self.params["b1"])
+        scores, w2_pass_cache = affine_forward(w1_pass, self.params["W2"], self.params["b2"])
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -112,7 +116,15 @@ class TwoLayerNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        # Calculate loss and gradients
+        loss, loss_scores = softmax_loss(scores, y)
+        # Apply L2 regularization to loss function to prevent overfitting
+        loss += 1/2 * self.reg * (np.sum(self.params["W2"]**2) + np.sum(self.params["W1"]**2))
+
+        w2out, grads["W2"], grads["b2"] = affine_backward(loss_scores, w2_pass_cache)
+        grads["W2"] += self.reg * self.params["W2"]
+        w1out, grads["W1"], grads["b1"] = affine_relu_backward(w2out, w1_pass_cache)
+        grads["W1"] += self.reg * self.params["W1"]
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
